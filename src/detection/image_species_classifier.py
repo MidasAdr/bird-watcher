@@ -6,7 +6,7 @@ import torch
 class ImageSpeciesClassifier:
     def __init__(self):
 
-        checkpoint = torch.load("models/european_birds.pth", map_location="cpu")
+        checkpoint = torch.load("model/models/european_birds.pth", map_location="cpu")
 
         self.classes = checkpoint["classes"]
 
