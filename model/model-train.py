@@ -43,9 +43,10 @@ for epoch in range(5):
 
     print("epoch", epoch, "loss", loss.item())
 
-os.makedirs(os.path.dirname("models"), exist_ok=True)
+save_path = "models/european_birds.pth"
+os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
 torch.save({
     "model": model.state_dict(),
     "classes": dataset.classes
-}, "models/european_birds.pth")
+}, save_path)
