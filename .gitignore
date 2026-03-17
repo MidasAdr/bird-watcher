@@ -205,3 +205,44 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# =========================
+# DATASETS (VERY IMPORTANT)
+# =========================
+/model-trainer/dataset/
+/dataset/
+
+# =========================
+# TRAINED MODELS
+# =========================
+*.pt
+*.pth
+*.onnx
+/models/
+
+# =========================
+# SNAPSHOTS / OUTPUT
+# =========================
+snapshots/
+*.jpg
+*.png
+
+# =========================
+# AUDIO FILES
+# =========================
+*.wav
+*.mp3
+
+# =========================
+# LOGS / CSV OUTPUT
+# =========================
+*.csv
+*.log
+
+# =========================
+# CACHE / TEMP FILES
+# =========================
+temp.wav
+__pycache__/
+*.pyc
+.cache/
