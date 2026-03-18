@@ -59,16 +59,25 @@ optimizer = torch.optim.Adam(
         {"params": model.fc.parameters(), "lr": 1e-4},
     ]
 )
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer, mode="min", factor=0.5, patience=3, verbose=True
+)
 loss_fn = nn.CrossEntropyLoss()
 
 save_path = "models/european_birds.pth"
 os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
 best_val_loss = float("inf")
+best_val_acc = 0.0
 
-for epoch in range(20):
+print(f"\n{'Epoch':<6} {'Train Loss':<12} {'Train Acc':<11} {'Val Loss':<12} {'Val Acc':<10} {'LR':<10}")
+print("-" * 65)
+
+for epoch in range(40):
     model.train()
     train_loss = 0.0
+    train_correct = 0
+    train_total = 0
 
     for imgs, labels in train_loader:
         imgs = imgs.to(device)
@@ -82,11 +91,17 @@ for epoch in range(20):
         optimizer.step()
 
         train_loss += loss.item()
+        train_correct += (preds.argmax(dim=1) == labels).sum().item()
+        train_total += labels.size(0)
 
     train_loss /= len(train_loader)
+    train_acc = train_correct / train_total
 
     model.eval()
     val_loss = 0.0
+    val_correct = 0
+    val_total = 0
+
     with torch.no_grad():
         for imgs, labels in val_loader:
             imgs = imgs.to(device)
@@ -94,18 +109,30 @@ for epoch in range(20):
 
             preds = model(imgs)
             loss = loss_fn(preds, labels)
+
             val_loss += loss.item()
+            val_correct += (preds.argmax(dim=1) == labels).sum().item()
+            val_total += labels.size(0)
 
     val_loss /= len(val_loader)
+    val_acc = val_correct / val_total
+
+    scheduler.step(val_loss)
+
+    lr = optimizer.param_groups[1]['lr']
+    saved = ""
 
     if val_loss < best_val_loss:
         best_val_loss = val_loss
+        best_val_acc = val_acc
         torch.save({
             "model": model.state_dict(),
             "classes": full_dataset.classes
         }, save_path)
-        print(f"epoch {epoch}  train_loss: {train_loss:.4f}  val_loss: {val_loss:.4f}  *saved*")
-    else:
-        print(f"epoch {epoch}  train_loss: {train_loss:.4f}  val_loss: {val_loss:.4f}")
+        saved = " *"
 
-print(f"Best model saved to {save_path} (val_loss: {best_val_loss:.4f})")
+    print(f"{epoch:<6} {train_loss:<12.4f} {train_acc:<11.1%} {val_loss:<12.4f} {val_acc:<10.1%} {lr:<10.1e}{saved}")
+
+print("-" * 65)
+print(f"Best model saved to {save_path}")
+print(f"Val loss: {best_val_loss:.4f}, Val accuracy: {best_val_acc:.1%}")
