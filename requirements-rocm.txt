@@ -1,0 +1,26 @@
+# ROCm-enabled dependencies for AMD GPUs
+# Install with: pip install -r requirements-rocm.txt
+
+# PyTorch with ROCm support (install first)
+--extra-index-url https://download.pytorch.org/whl/rocm6.2
+torch
+torchvision
+
+# ML libraries
+ultralytics
+timm
+transformers
+
+# TensorFlow with ROCm support (for birdnetlib)
+tensorflow-rocm
+
+# Audio processing
+sounddevice
+soundfile
+librosa
+birdnetlib
+
+# Computer vision and utilities
+opencv-python
+numpy
+pillow
